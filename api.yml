@@ -1,0 +1,59 @@
+#export ANSIBLE_VAULT_PASSWORD_FILE=/home/puboldi/pass
+#ansible-playbook /opt/ansible/development/playbooks/Interface/api.yml  -i /opt/ansible/host 
+
+  - name: Interfaccia Bonooser
+    hosts: localhost
+    gather_facts: false
+    become: no
+
+    vars:
+      bonoos_csv: interfaccia_bonoos.csv
+      sftp_extra: "-o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa"
+      sftp_key: /tmp/bonos.key
+      api_key: "ODIyOWQ1NmEtOTIxYi00ZGY2LTk5MDctMmIyZWJmYTI4ZDQ5OmM1MzA4ODNhLTA4ODMtNDU5Zi1hODY3LTc1OGNjMTYwNDQyOA=="
+
+    tasks:
+    - name: Remove file (bonoos_csv)
+      ansible.builtin.file:
+        path: /tmp/bonos.key
+        state: absent
+
+    - name: Copy the file from srv to docker server
+      copy: 
+        src: bonos.key
+        dest: /tmp/bonos.key
+        mode: '600'
+
+    - name: Remove file (bonoos_csv)
+      ansible.builtin.file:
+        path: "/tmp/{{ bonoos_csv }}"
+        state: absent
+
+    - name: Get bonoos_csv from Sftp hr.zucchetti.com
+      ansible.builtin.command: "sftp -i {{ sftp_key }} {{ sftp_extra }} sftptecniplast@hr.zucchetti.com:/pub/{{ bonoos_csv }} /tmp/{{ bonoos_csv }}"
+
+    - name: Read the file content estituisce il contenuto codificato in base64 (bonoos_csv)
+      slurp:
+        src: "/tmp/{{ bonoos_csv }}"
+      register: file_content
+
+    - name: Send bonoos by API
+      ansible.builtin.uri:
+        url: https://xakr-toja-lyep.f2.xano.io/api:7sn1GdK0/Bonooser/SendUserFile
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          X-Data-Source: "test"
+          Authorization: "Basic {{ api_key }}"
+        body_format: form-multipart
+        body:
+          UserMassFile: "data:application/octet-stream;base64,{{ file_content.content }}"
+        status_code: 200
+
+    - name: Remove file (bonoos_csv)
+      ansible.builtin.file:
+        path: "/tmp/{{ bonoos_csv }}"
+        state: absent
+
+# #sftp -i /home/puboldi/.ssh/bonos.key -oHostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa sftptecniplast@hr.zucchetti.com:/var/www/areeSFTP/sftptecniplast/pub/interfaccia_bonoos.csv /tmp/interfaccia_bonoos.csv
+# #curl --location 'https://xakr-toja-lyep.f2.xano.io/api:7sn1GdK0/Bonooser/SendUserFile' --header 'accept: application/json' --header 'X-Data-Source: test' --header 'Authorization: Basic 8229d56a-921b-4df6-9907-2b2ebfa28d49:c530883a-0883-459f-a867-758cc1604428' --form 'UserMassFile=@"/tmp/file"'
