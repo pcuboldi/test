@@ -7,17 +7,17 @@
     vars:
       bonoos_csv: interfaccia_bonoos.csv
       sftp_extra: "-o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa"
-      sftp_key: /tmp/bonos.key
+      sftp_key: bonos.key
       api_key: "ODIyOWQ1NmEtOTIxYi00ZGY2LTk5MDctMmIyZWJmYTI4ZDQ5OmM1MzA4ODNhLTA4ODMtNDU5Zi1hODY3LTc1OGNjMTYwNDQyOA=="
 
     tasks:
 
     - name: Get bonoos_csv from Sftp hr.zucchetti.com
-      ansible.builtin.command: "sftp -i {{ sftp_key }} {{ sftp_extra }} sftptecniplast@hr.zucchetti.com:/pub/{{ bonoos_csv }} /tmp/{{ bonoos_csv }}"
+      ansible.builtin.command: "sftp -i {{ sftp_key }} {{ sftp_extra }} sftptecniplast@hr.zucchetti.com:/pub/{{ bonoos_csv }} {{ bonoos_csv }}"
 
     - name: Read the file content estituisce il contenuto codificato in base64 (bonoos_csv)
       slurp:
-        src: "/tmp/{{ bonoos_csv }}"
+        src: "{{ bonoos_csv }}"
       register: file_content
 
     - name: Send bonoos by API
