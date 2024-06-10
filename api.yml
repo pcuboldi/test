@@ -8,7 +8,7 @@
       bonoos_csv: interfaccia_bonoos.csv
       sftp_extra: "-o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa"
       sftp_key: bonos.key
-      api_key: "ODIyOWQ1NmEtOTIxYi00ZGY2LTk5MDctMmIyZWJmYTI4ZDQ5OmM1MzA4ODNhLTA4ODMtNDU5Zi1hODY3LTc1OGNjMTYwNDQyOA=="
+      api_key: "ODIyOWQ1NmEtOT5Zi1hODY3LTc1OGNjMTYwNDQyOA=="
 
     tasks:
 
