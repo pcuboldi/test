@@ -14,21 +14,3 @@
 
     - name: Get bonoos_csv from Sftp hr.zucchetti.com
       ansible.builtin.command: "sftp -i {{ sftp_key }} {{ sftp_extra }} sftptecniplast@hr.zucchetti.com:/pub/{{ bonoos_csv }} {{ bonoos_csv }}"
-
-    - name: Read the file content estituisce il contenuto codificato in base64 (bonoos_csv)
-      slurp:
-        src: "{{ bonoos_csv }}"
-      register: file_content
-
-    - name: Send bonoos by API
-      ansible.builtin.uri:
-        url: https://xakr-toja-lyep.f2.xano.io/api:7sn1GdK0/Bonooser/SendUserFile
-        method: POST
-        headers:
-          Content-Type: "application/json"
-          X-Data-Source: "test"
-          Authorization: "Basic {{ api_key }}"
-        body_format: form-multipart
-        body:
-          UserMassFile: "data:application/octet-stream;base64,{{ file_content.content }}"
-        status_code: 200
