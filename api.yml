@@ -1,12 +1,10 @@
   - name: Interfaccia Bonooser
-    hosts: localhost
-    gather_facts: yes
+    hosts: all
+    gather_facts: no
     become: no
 
-
     tasks:
-
-    - name: Remove file (bonoos_csv)
+    - name: Change file ownership, group and permissions
       ansible.builtin.file:
-        path: "{{ bonoos_csv }}"
-        state: absent
+        path: /tmp/foo.conf
+
